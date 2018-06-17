@@ -1,14 +1,14 @@
 (ns core
   (:use [clojure.tools.nrepl.server :only [start-server stop-server]])
-  (:import [com.pi4j.io.gpio GpioController GpioFactory GpioPinDigitalOutput PinState RaspiPin]))
+  (:require [gpio :as gpio]))
 
-(def nrepl-port 4815)
-(def nrepl-server (atom nil))
+(def ^:private nrepl-port 4815)
+(def ^:private nrepl-server (atom nil))
 
-(defn start-nrepl-server []
+(defn- start-nrepl-server []
   (reset! nrepl-server (start-server :port nrepl-port)))
 
-(defn stop-nrepl-server []
+(defn- stop-nrepl-server []
   (swap! nrepl-server (fn [server]
                         (let [stopped (stop-server server)]
                           (println (str "silvestris has stopped the nrepl server at port "
@@ -17,13 +17,12 @@
                           stopped))))
 
 
-(defn add-shutdown-hooks []
-  (.addShutdownHook (Runtime/getRuntime)
-                    (Thread. (fn []
-                               (println "silvestris is shutting down...")
-                               (stop-nrepl-server)))))
+(defn- add-shutdown-hooks [handlers]
+  (doseq [handler handlers]
+    (.addShutdownHook (Runtime/getRuntime)
+                      (Thread. handler))))
 
-(defn set-system-properties []
+(defn- set-system-properties []
   ;; https://github.com/Pi4J/pi4j/issues/319
   (System/setProperty "pi4j.linking" "dynamic")
   (System/setProperty "pi4j.debug" "true"))
@@ -36,4 +35,6 @@
   (println (str "silvestris has started the nrepl server at port "
                 nrepl-port
                 "."))
-  (add-shutdown-hooks))
+  (gpio/start)
+  (println "silvestris has started gpio.")
+  (add-shutdown-hooks [#(stop-nrepl-server) #(gpio/stop)]))
