@@ -24,8 +24,8 @@
 
 (defn- set-system-properties []
   ;; https://github.com/Pi4J/pi4j/issues/319
-  (System/setProperty "pi4j.linking" "dynamic")
-  (System/setProperty "pi4j.debug" "true"))
+  (System/setProperty "pi4j.debug" "true")
+  (System/setProperty "pi4j.linking" "dynamic"))
 
 (defn -main []
   (set-system-properties)
