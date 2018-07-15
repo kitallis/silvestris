@@ -1,6 +1,6 @@
 (ns gpio
   (:import [com.pi4j.io.gpio GpioController GpioFactory GpioPinDigitalOutput PinState RaspiPin]
-           [com.pi4j.io.gpio.impl GpioPinImpl]))
+           [com.pi4j.io.gpio.impl PinImpl GpioPinImpl]))
 
 (def ^:private gpio (atom nil))
 
@@ -44,7 +44,7 @@
 (defn provision-pin
   ([]
    (provision-pin RaspiPin/GPIO_29 "BCM.PIN.21" PinState/HIGH))
-  ([pin-name tag default-state]
+  ([^PinImpl pin-name tag ^PinState default-state]
    (doto
        (.provisionDigitalOutputPin @gpio
                                    pin-name
@@ -52,5 +52,5 @@
                                    default-state)
        (.setShutdownOptions true PinState/LOW))))
 
-(defn unprovision-pin [pin]
+(defn unprovision-pin [^GpioPinImpl pin]
   (.unprovisionPin @gpio (into-array GpioPinImpl [pin])))
