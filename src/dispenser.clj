@@ -12,7 +12,7 @@
   (gpio/pwm! pin 0))
 
 (defn stop  []
-  (thread/stop-tp @dispenser))
+  (swap! dispenser #(thread/stop-tp %)))
 
 (defn start []
   (gpio/configure-pwm! :pwm-range 2000 :pwm-clock 192)

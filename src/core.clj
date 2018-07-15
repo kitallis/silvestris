@@ -15,7 +15,7 @@
                           (println (format "silvestris has stopped the nrepl server at port %d"
                                            nrepl-port))
                           stopped)))
-  (println (format "silvestris has started the nrepl server at port %."
+  (println (format "silvestris has started the nrepl server at port %d."
                    nrepl-port)))
 
 

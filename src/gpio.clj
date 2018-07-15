@@ -37,7 +37,6 @@
    (alter provisioned-pins shutdown-pins))
   (println "stopped a gpio instance."))
 
-
 (defn track-provisioned-pins [pin type]
   (dosync
    (alter provisioned-pins conj {:pin pin
