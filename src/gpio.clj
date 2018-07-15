@@ -1,4 +1,4 @@
-(ns gpio
+(ns silvestris.gpio
   (:import [com.pi4j.io.gpio GpioController GpioFactory GpioPinDigitalOutput PinState RaspiPin]
            [com.pi4j.io.gpio.impl GpioPinImpl]))
 

@@ -1,4 +1,4 @@
-(ns thread
+(ns silvestris.thread
   (:import [java.util.concurrent Executors ThreadPoolExecutor TimeUnit]))
 
 (defn create-scheduled-tp [f rate]
