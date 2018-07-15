@@ -1,5 +1,14 @@
 (ns gpio
-  (:import [com.pi4j.io.gpio GpioController GpioFactory GpioPinDigitalOutput PinState RaspiPin]
+  (:import [com.pi4j.wiringpi Gpio]
+           [com.pi4j.io.gpio GpioController
+            GpioFactory
+
+            GpioPinDigitalOutput
+            GpioPinPwmOutput
+
+            PinState
+            RaspiPin
+            PinPullResistance]
            [com.pi4j.io.gpio.impl PinImpl GpioPinImpl]))
 
 (def ^:private gpio (atom nil))
@@ -41,16 +50,45 @@
 ;; | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
 ;; +-----+-----+---------+------+---+---Pi 3---+---+------+---------+-----+-----+
 
-(defn provision-pin
-  ([]
-   (provision-pin RaspiPin/GPIO_29 "BCM.PIN.21" PinState/HIGH))
-  ([^PinImpl pin-name tag ^PinState default-state]
-   (doto
-       (.provisionDigitalOutputPin @gpio
-                                   pin-name
-                                   tag
-                                   default-state)
-       (.setShutdownOptions true PinState/LOW))))
+(defn configure-pwm! [& {:keys [pwm-range pwm-clock]}]
+  (Gpio/pwmSetMode  Gpio/PWM_MODE_MS)
+  (when (and pwm-clock
+             pwm-range)
+    (Gpio/pwmSetClock (or pwm-clock 500))
+    (Gpio/pwmSetRange (or pwm-range 1000))))
 
-(defn unprovision-pin [^GpioPinImpl pin]
+(defn pwm  [^GpioPinPwmOutput pin] (.getPwm pin))
+(defn pwm! [^GpioPinPwmOutput pin val] (.setPwm pin val))
+
+(def pin
+  {:pin-name RaspiPin/GPIO_26
+   :tag "BCM.PIN.12"
+   :default-state PinState/HIGH})
+
+(def do-pin  (assoc pin :pin :digital-out))
+(def pwm-pin (assoc pin :pin :pwm))
+
+(defmulti  provision-pin! :pin)
+(defmethod provision-pin! :digital-out
+  [{:keys [^PinImpl pin-name tag ^PinState default-state]}]
+  (doto
+      (.provisionDigitalOutputPin @gpio
+                                  pin-name
+                                  tag
+                                  default-state)
+      (.setShutdownOptions true PinState/LOW PinPullResistance/OFF)))
+
+(defmethod provision-pin! :pwm
+  [{:keys [^PinImpl pin-name tag ^PinState default-state]}]
+  (doto
+      (.provisionPwmOutputPin @gpio
+                              pin-name
+                              tag)
+      (.setShutdownOptions true PinState/LOW PinPullResistance/OFF)))
+
+(defn low!    [pin] (.low pin))
+(defn high!   [pin] (.high pin))
+(defn toggle! [pin] (.toggle pin))
+
+(defn unprovision-pin! [^GpioPinImpl pin]
   (.unprovisionPin @gpio (into-array GpioPinImpl [pin])))
