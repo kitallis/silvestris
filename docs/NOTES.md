@@ -14,18 +14,17 @@ Reading resistor shorthands:
 ```
 
 ## LEDs
-
-![Diode](led.png)
-![Diode Sizing](led-sizing.png)
+![Diode](img/led.png)
+![Diode Sizing](img/led-sizing.png)
 
 ## Servo Motors / PWM
 
-![Servo Motor Color Codes](servo-color-code.gif)
+![Servo Motor Color Codes](img/servo-color-code.gif)
 
 **PWM**: Pulse Width Modulation
 
-![PWM 25%](pwm-25.PNG)
-![PWM 75%](pwm-75.PNG)
+![PWM 25%](img/pwm-25.PNG)
+![PWM 75%](img/pwm-75.PNG)
 
 * All Raspberry Pi models support a hardware `PWM` pin on `GPIO_01`.
 * Raspberry Pi models `A+, B+, 2B, 3B` also support hardware `PWM` pins: `GPIO_23`, `GPIO_24`, `GPIO_26`
