@@ -1,4 +1,4 @@
-(ns silvestris.core
+(ns core
   (:use [clojure.tools.nrepl.server :only [start-server stop-server]])
   (:require [gpio :as gpio]))
 
