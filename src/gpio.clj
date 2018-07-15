@@ -9,9 +9,12 @@
             PinState
             RaspiPin
             PinPullResistance]
-           [com.pi4j.io.gpio.impl PinImpl GpioPinImpl]))
+           [com.pi4j.io.gpio.impl PinImpl GpioPinImpl])
+  (:require [clj-time.core :as t]
+            [thread :as thread]))
 
 (def ^:private gpio (atom nil))
+(def ^:private provisioned-pins (atom ()))
 
 (defn start []
   (reset! gpio (GpioFactory/getInstance))
@@ -20,6 +23,10 @@
 (defn stop []
   (swap! gpio (fn [v] (.shutdown v)))
   (println "stopped a gpio instance."))
+
+(defn audit-provisioned-pins [pin type]
+  (swap! provisioned-pins conj {:pin pin :ts (t/now) :type type})
+  pin)
 
 ;; wiringPi reference table
 ;;
@@ -61,8 +68,8 @@
 (defn pwm! [^GpioPinPwmOutput pin val] (.setPwm pin val))
 
 (def pin
-  {:pin-name RaspiPin/GPIO_26
-   :tag "BCM.PIN.12"
+  {:pin-name RaspiPin/GPIO_25
+   :tag "BCM.PIN.26"
    :default-state PinState/HIGH})
 
 (def do-pin  (assoc pin :pin :digital-out))
@@ -76,6 +83,7 @@
                                   pin-name
                                   tag
                                   default-state)
+      (audit-provisioned-pins :digital-out)
       (.setShutdownOptions true PinState/LOW PinPullResistance/OFF)))
 
 (defmethod provision-pin! :pwm
@@ -84,6 +92,7 @@
       (.provisionPwmOutputPin @gpio
                               pin-name
                               tag)
+      (audit-provisioned-pins :pwm)
       (.setShutdownOptions true PinState/LOW PinPullResistance/OFF)))
 
 (defn low!    [pin] (.low pin))
@@ -92,3 +101,15 @@
 
 (defn unprovision-pin! [^GpioPinImpl pin]
   (.unprovisionPin @gpio (into-array GpioPinImpl [pin])))
+
+(defn spin! [pin]
+  (pwm! pin 2)
+  (Thread/sleep 1000)
+  (pwm! pin 0))
+
+(comment
+  (configure-pwm! :pwm-range 2000 :pwm-clock 192)
+  (def pin (provision-pin! pwm-pin))
+  (def thp (thread/create-scheduled-tp (partial spin! pin) 2000))
+  (unprovision-pin! pin)
+  (println "Ran all"))

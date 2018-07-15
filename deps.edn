@@ -1,3 +1,4 @@
 {:deps
  {com.pi4j/pi4j-core {:mvn/version "1.1"}
-  org.clojure/tools.nrepl {:mvn/version "0.2.12"}}}
+  org.clojure/tools.nrepl {:mvn/version "0.2.12"}
+  clj-time {:mvn/version "0.14.4"}}}
