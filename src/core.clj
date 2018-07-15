@@ -38,7 +38,6 @@
   (gpio/start)
   (dispenser/start)
 
-  (println "silvestris has started gpio.")
   (add-shutdown-hooks [#(stop-nrepl-server)
                        #(gpio/stop)
                        #(dispenser/stop)]))

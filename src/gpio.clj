@@ -58,13 +58,13 @@
 (defn pwm  [^GpioPinPwmOutput pin] (.getPwm pin))
 (defn pwm! [^GpioPinPwmOutput pin val] (.setPwm pin val))
 
-(def pin
-  {:pin-name RaspiPin/GPIO_25
-   :tag "BCM.PIN.26"
+(def default-pin
+  {:pin-name RaspiPin/GPIO_26
+   :tag "BCM.PIN.12"
    :default-state PinState/HIGH})
 
-(def do-pin  (assoc pin :pin digital-out))
-(def pwm-pin (assoc pin :pin pwm))
+(def default-do-pin  (assoc default-pin :pin digital-out))
+(def default-pwm-pin (assoc default-pin :pin pwm))
 
 (defmulti  provision-pin! :pin)
 (defmethod provision-pin! digital-out
