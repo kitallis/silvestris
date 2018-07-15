@@ -17,8 +17,6 @@
 (defn start []
   (gpio/configure-pwm! :pwm-range 2000 :pwm-clock 192)
   (let [pin (gpio/provision-pin! gpio/default-pwm-pin)]
-    (swap! dispenser
-           thread/create-scheduled-tp
-           (partial dispense! pin)
-           schedule-ms))
+    (reset! dispenser (thread/create-scheduled-tp (partial dispense! pin)
+                                                  schedule-ms)))
   (println (format "started the dispenser, scheduled to run every %dms" schedule-ms)))
